@@ -1,40 +1,84 @@
-![React Virtual Header](https://github.com/tannerlinsley/react-virtual/raw/master/media/repo-dark.png)
+# React Native Virtual
 
-Hooks for virtualizing scrollable elements in React
+Hooks for virtualizing scrollable elements in React Native, a fork of
+Tanner Linsley's
+[React Virtual](https://github.com/tannerlinsley/react-virtual).
 
-<a href="https://twitter.com/intent/tweet?button_hashtag=TanStack" target="\_parent">
-  <img alt="#TanStack" src="https://img.shields.io/twitter/url?color=%2308a0e9&label=%23TanStack&style=social&url=https%3A%2F%2Ftwitter.com%2Fintent%2Ftweet%3Fbutton_hashtag%3DTanStack">
-</a>
-<a href="https://npmjs.com/package/react-virtual" target="\_parent">
-  <img alt="" src="https://img.shields.io/npm/dm/react-virtual.svg" />
-</a>
-<a href="https://bundlephobia.com/result?p=react-virtual" target="\_parent">
-  <img alt="" src="https://badgen.net/bundlephobia/minzip/react-virtual" />
-</a>
-<a href="https://spectrum.chat/react-virtual">
-  <img alt="Join the community on Spectrum" src="https://withspectrum.github.io/badge/badge.svg" />
-</a>
-<a href="https://github.com/react-virtual/react-virtual" target="\_parent">
-  <img alt="" src="https://img.shields.io/github/stars/react-virtual/react-virtual.svg?style=social&label=Star" />
-</a>
-<a href="https://twitter.com/tannerlinsley" target="\_parent">
-  <img alt="" src="https://img.shields.io/twitter/follow/tannerlinsley.svg?style=social&label=Follow" />
-</a>
+## API
 
-<br />
-<br />
+Same as [React Virtual](https://react-virtual.tanstack.com/docs/api),
+except:
 
-Enjoy this library? Try the entire [TanStack](https://tanstack.com)! [React Query](https://github.com/tannerlinsley/react-query), [React Table](https://github.com/tannerlinsley/react-table), [React Charts](https://github.com/tannerlinsley/react-charts), [React Form](https://github.com/tannerlinsley/react-form)
+#### Options
 
-## Visit [react-virtual.tanstack.com](https://react-virtual.tanstack.com) for docs, guides, API and more!
+- no `useObserver` (functionality replaced by the `onLayout` return).
 
-## Quick Features
+#### Returns
 
-- Row, Column, and Grid virtualization
-- One single **headless** hook
-- Fixed, variable and dynamic measurement modes
-- Imperative scrollTo control for offset, indices and alignment
-- Custom scrolling function support (eg. smooth scroll)
-- <a href="https://bundlephobia.com/result?p=react-virtual@latest" target="\_parent">
-  <img alt="" src="https://badgen.net/bundlephobia/minzip/react-virtual@latest" />
-  </a>
+- `onLayout`: prop to attach to parent ScrollView component
+- `onScroll`: prop to attach to parent ScrollView component
+
+### `useVirtual()`
+
+```
+ const {
+   virtualItems: [
+     { key, index, start, size, end, measureRef },
+     /* ... */
+   ],
+   totalSize,
+   scrollToIndex,
+   scrollToOffset,
+   onLayout,
+   onScroll,
+ } = useVirtual({
+   size,
+   parentRef,
+   estimateSize,
+   overscan,
+   horizontal,
+   scrollToFn,
+ })
+```
+
+## Usage
+
+```
+function RowVirtualizer() {
+  const parentRef = React.useRef();
+
+  const virtualizer = useVirtual({
+    size: 1000,
+    parentRef,
+    estimateSize: React.useCallback(() => 35, []),
+  });
+
+  return (
+    <ScrollView
+      ref={parentRef}
+      scrollEventThrottle={16}
+      onScroll={virtualizer.onScroll}
+      onLayout={virtualizer.onLayout}
+    >
+      <View style={{ height: virtualizer.totalSize }}>
+        {virtualizer.virtualItems.map((virtualRow) => (
+          <View
+            key={virtualRow.index}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: virtualRow.size,
+              transform: [{ translateY: virtualRow.start }],
+            }}
+          >
+            Row {virtualRow.index}
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+}
+
+```
