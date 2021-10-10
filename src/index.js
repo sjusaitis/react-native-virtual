@@ -1,6 +1,5 @@
 import React from 'react'
 
-import useRect from './useRect'
 import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect'
 
 const defaultEstimateSize = () => 50
@@ -35,22 +34,25 @@ export function useVirtual({
   parentRef,
   horizontal,
   scrollToFn,
-  useObserver,
-  onScrollElement,
   scrollOffsetFn,
   keyExtractor = defaultKeyExtractor,
   measureSize = defaultMeasureSize,
   rangeExtractor = defaultRangeExtractor,
 }) {
   const sizeKey = horizontal ? 'width' : 'height'
-  const scrollKey = horizontal ? 'scrollLeft' : 'scrollTop'
+  const scrollKey = horizontal ? 'x' : 'y'
   const latestRef = React.useRef({
     scrollOffset: 0,
     measurements: [],
   })
-  const useMeasureParent = useObserver || useRect
 
-  const { [sizeKey]: outerSize } = useMeasureParent(parentRef) || {
+  const [parentDimensions, setParentDimensions] = React.useState(null)
+
+  const onLayout = React.useCallback(({ nativeEvent }) => {
+    setParentDimensions(nativeEvent.layout)
+  }, [])
+
+  const { [sizeKey]: outerSize } = parentDimensions || {
     [sizeKey]: 0,
   }
   latestRef.current.outerSize = outerSize
@@ -58,7 +60,7 @@ export function useVirtual({
   const defaultScrollToFn = React.useCallback(
     offset => {
       if (parentRef.current) {
-        parentRef.current[scrollKey] = offset
+        parentRef.current.scrollTo({ [scrollKey]: offset })
       }
     },
     [parentRef, scrollKey]
@@ -107,8 +109,6 @@ export function useVirtual({
 
   const [range, setRange] = React.useState({ start: 0, end: 0 })
 
-  const element = onScrollElement ? onScrollElement.current : parentRef.current
-
   const scrollOffsetFnRef = React.useRef(scrollOffsetFn)
   scrollOffsetFnRef.current = scrollOffsetFn
 
@@ -128,37 +128,17 @@ export function useVirtual({
     return () => cancelAsyncRange()
   }, [measurements, outerSize, cancelAsyncRange])
 
-  useIsomorphicLayoutEffect(() => {
-    if (!element) {
-      setRange({ start: 0, end: 0 })
-      latestRef.current.scrollOffset = 0
-
-      return
-    }
-
-    const onScroll = event => {
-      const scrollOffset = scrollOffsetFnRef.current
-        ? scrollOffsetFnRef.current(event)
-        : element[scrollKey]
+  const onScroll = React.useCallback(
+    ({ nativeEvent }) => {
+      const scrollOffset = nativeEvent.contentOffset[scrollKey]
 
       latestRef.current.scrollOffset = scrollOffset
 
       cancelAsyncRange()
       setRange(prevRange => calculateRange(latestRef.current, prevRange))
-    }
-
-    // Determine initially visible range
-    onScroll()
-
-    element.addEventListener('scroll', onScroll, {
-      capture: false,
-      passive: true,
-    })
-
-    return () => {
-      element.removeEventListener('scroll', onScroll)
-    }
-  }, [element, scrollKey, cancelAsyncRange])
+    },
+    [cancelAsyncRange, scrollKey]
+  )
 
   const measureSizeRef = React.useRef(measureSize)
   measureSizeRef.current = measureSize
@@ -302,6 +282,8 @@ export function useVirtual({
     scrollToOffset,
     scrollToIndex,
     measure,
+    onScroll,
+    onLayout,
   }
 }
 
