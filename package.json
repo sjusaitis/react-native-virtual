@@ -1,7 +1,7 @@
 {
-  "name": "react-virtual",
+  "name": "react-native-virtual",
   "version": "0.0.0",
-  "description": "Hooks for virtualizing scrollable elements in React",
+  "description": "Hooks for virtualizing scrollable elements in React Native",
   "author": "tannerlinsley",
   "license": "MIT",
   "repository": "tannerlinsley/react-virtual",
@@ -13,7 +13,6 @@
     "https://github.com/sponsors/tannerlinsley"
   ],
   "main": "index.js",
-  "module": "dist/react-virtual.mjs",
   "types": "types",
   "sideEffects": false,
   "scripts": {
@@ -21,18 +20,7 @@
     "test:dev": "jest --watch",
     "test:ci": "jest",
     "test:coverage": "yarn test:ci; open coverage/lcov-report/index.html",
-    "build": "NODE_ENV=production rollup -c",
-    "now-build": "yarn && cd www && yarn && yarn build",
-    "start": "rollup -c -w",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn test:ci && yarn formatReadme",
-    "release": "yarn publish",
-    "releaseNext": "yarn publish --tag next",
     "format": "prettier {src,src/**,example/src,example/src/**}/*.{md,js,jsx,tsx} --write",
-    "formatReadme": "yarn doctoc",
-    "doctoc": "npx doctoc --maxlevel 2 README.md",
-    "jump2header": "npx @strdr4605/jump2header --header 'documentation' --start 'Installation' -e 2 --silent -l 2",
-    "stats": "open ./stats.html",
     "dtslint": "dtslint types"
   },
   "files": [
@@ -40,9 +28,6 @@
     "types",
     "scripts"
   ],
-  "dependencies": {
-    "@reach/observe-rect": "^1.1.0"
-  },
   "peerDependencies": {
     "react": "^16.6.3 || ^17.0.0"
   },
