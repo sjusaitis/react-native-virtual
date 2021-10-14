@@ -1,17 +1,10 @@
 {
   "name": "react-native-virtual",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Hooks for virtualizing scrollable elements in React Native",
-  "author": "tannerlinsley",
+  "author": "tannerlinsley / sjusaitis",
   "license": "MIT",
-  "repository": "tannerlinsley/react-virtual",
-  "homepage": "https://github.com/tannerlinsley/react-virtual#readme",
-  "support": {
-    "backing": "npm-funding"
-  },
-  "funding": [
-    "https://github.com/sponsors/tannerlinsley"
-  ],
+  "repository": "sjusaitis/react-native-virtual",
   "main": "index.js",
   "types": "types",
   "sideEffects": false,
