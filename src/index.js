@@ -6,12 +6,6 @@ const defaultEstimateSize = () => 50
 
 const defaultKeyExtractor = index => index
 
-const defaultMeasureSize = (el, horizontal) => {
-  const key = horizontal ? 'offsetWidth' : 'offsetHeight'
-
-  return el[key]
-}
-
 export const defaultRangeExtractor = range => {
   const start = Math.max(range.start - range.overscan, 0)
   const end = Math.min(range.end + range.overscan, range.size - 1)
@@ -36,7 +30,6 @@ export function useVirtual({
   scrollToFn,
   scrollOffsetFn,
   keyExtractor = defaultKeyExtractor,
-  measureSize = defaultMeasureSize,
   rangeExtractor = defaultRangeExtractor,
 }) {
   const sizeKey = horizontal ? 'width' : 'height'
@@ -140,9 +133,6 @@ export function useVirtual({
     [cancelAsyncRange, scrollKey]
   )
 
-  const measureSizeRef = React.useRef(measureSize)
-  measureSizeRef.current = measureSize
-
   const virtualItems = React.useMemo(() => {
     const indexes = rangeExtractor({
       start: range.start,
@@ -159,24 +149,22 @@ export function useVirtual({
 
       const item = {
         ...measurement,
-        measureRef: el => {
-          if (el) {
-            const measuredSize = measureSizeRef.current(el, horizontal)
+        measureOnLayout: ({ nativeEvent }) => {
+          const measuredSize = nativeEvent.layout[sizeKey]
 
-            if (measuredSize !== item.size) {
-              const { scrollOffset } = latestRef.current
+          if (measuredSize !== item.size) {
+            const { scrollOffset } = latestRef.current
 
-              if (item.start < scrollOffset) {
-                defaultScrollToFn(scrollOffset + (measuredSize - item.size))
-              }
-
-              pendingMeasuredCacheIndexesRef.current.push(i)
-
-              setMeasuredCache(old => ({
-                ...old,
-                [item.key]: measuredSize,
-              }))
+            if (item.start < scrollOffset) {
+              defaultScrollToFn(scrollOffset + (measuredSize - item.size))
             }
+
+            pendingMeasuredCacheIndexesRef.current.push(i)
+
+            setMeasuredCache(old => ({
+              ...old,
+              [item.key]: measuredSize,
+            }))
           }
         },
       }
@@ -187,12 +175,12 @@ export function useVirtual({
     return virtualItems
   }, [
     defaultScrollToFn,
-    horizontal,
     measurements,
     overscan,
     range.end,
     range.start,
     rangeExtractor,
+    sizeKey,
   ])
 
   const mountedRef = React.useRef()

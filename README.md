@@ -4,9 +4,9 @@ Hooks for virtualizing scrollable elements in React Native, a fork of
 Tanner Linsley's
 [React Virtual](https://github.com/tannerlinsley/react-virtual).
 
-## API
+## API changes from React Virtual
 
-Same as [React Virtual](https://react-virtual.tanstack.com/docs/api),
+The API is largely the same as [React Virtual](https://react-virtual.tanstack.com/docs/api),
 except:
 
 #### Options
@@ -15,6 +15,9 @@ except:
 
 #### Returns
 
+- `virtualItems` → `measureOnLayout`: optional prop that can be placed
+  on the child view to perform dynamic measurement (used insted
+  of React Virtual's `measureRef`).
 - `onLayout`: prop to attach to parent ScrollView component
 - `onScroll`: prop to attach to parent ScrollView component
 
@@ -23,7 +26,7 @@ except:
 ```
  const {
    virtualItems: [
-     { key, index, start, size, end, measureRef },
+     { key, index, start, size, end, measureOnLayout },
      /* ... */
    ],
    totalSize,
