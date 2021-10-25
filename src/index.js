@@ -52,7 +52,7 @@ export function useVirtual({
 
   const defaultScrollToFn = React.useCallback(
     offset => {
-      if (parentRef.current) {
+      if (parentRef?.current) {
         parentRef.current.scrollTo({ [scrollKey]: offset })
       }
     },
