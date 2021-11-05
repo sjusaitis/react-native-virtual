@@ -11,7 +11,12 @@ except:
 
 #### Options
 
-- no `useObserver` (functionality replaced by the `onLayout` return).
+- `parentDimensions: { width: number; height: number }` optional,
+  instead of attaching the returned `onLayout` prop to the ScrollView,
+  you can
+  explicitly provide the dimensions.
+- no `useObserver` (functionality replaced by either the provided
+  `parentDimensions` or the `onLayout` return).
 
 #### Returns
 
@@ -37,6 +42,7 @@ except:
  } = useVirtual({
    size,
    parentRef,
+   parentDimensions,
    estimateSize,
    overscan,
    horizontal,

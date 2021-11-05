@@ -26,6 +26,7 @@ export function useVirtual({
   paddingStart = 0,
   paddingEnd = 0,
   parentRef,
+  parentDimensions,
   horizontal,
   scrollToFn,
   scrollOffsetFn,
@@ -39,13 +40,14 @@ export function useVirtual({
     measurements: [],
   })
 
-  const [parentDimensions, setParentDimensions] = React.useState(null)
-
+  const [onLayoutDimensions, setOnLayoutDimensions] = React.useState(null)
   const onLayout = React.useCallback(({ nativeEvent }) => {
-    setParentDimensions(nativeEvent.layout)
+    setOnLayoutDimensions(nativeEvent.layout)
   }, [])
 
-  const { [sizeKey]: outerSize } = parentDimensions || {
+  const resolvedParentDimensions = parentDimensions || onLayoutDimensions
+
+  const { [sizeKey]: outerSize } = resolvedParentDimensions || {
     [sizeKey]: 0,
   }
   latestRef.current.outerSize = outerSize
